@@ -44,7 +44,7 @@ class HomePage extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.tune),
             onPressed: () {
-              print("filter button clicked");
+              print("filter button clicked2");
             },
           ),
         ],
