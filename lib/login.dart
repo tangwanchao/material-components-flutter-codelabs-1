@@ -14,48 +14,111 @@
 
 import 'package:flutter/material.dart';
 
+import 'colors.dart';
+
 class LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _usernameFocusNode = FocusNode();
+  final _passwordFocusNode = FocusNode();
+  final _scrollController = ScrollController(keepScrollOffset: true);
+  final _listKey = GlobalKey();
+  bool _didChangeMetrics = false;
+  bool _bottomInsetFinished = false;
+  double _bottomInset = 0;
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPersistentFrameCallback((Duration timeStamp) {
+      var bottomInset = MediaQuery
+          .of(context)
+          .viewInsets
+          .bottom;
+      if (bottomInset == 0) {
+        _didChangeMetrics = false;
+        return;
+      }
+
+      if (bottomInset != _bottomInset) {
+        _bottomInset = bottomInset;
+        _bottomInsetFinished = false;
+      } else {
+        _bottomInset = bottomInset;
+        _bottomInsetFinished = true;
+      }
+
+      if (_didChangeMetrics == true &&
+          (_usernameFocusNode.hasFocus || _passwordFocusNode.hasFocus) &&
+          _bottomInset > 50) {
+        _didChangeMetrics = false;
+        setState(() {
+          _scrollController.animateTo(
+            context.size.height - _listKey.currentContext.size.height,
+            duration: Duration(
+              milliseconds: 300,
+            ),
+            curve: Curves.decelerate,
+          );
+        });
+      }
+    });
+    super.initState();
+  }
+
+  @override
+  void didChangeMetrics() {
+    _didChangeMetrics = true;
+    super.didChangeMetrics();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: ListView(
+          key: _listKey,
+          controller: _scrollController,
           padding: EdgeInsets.symmetric(horizontal: 24.0),
           children: <Widget>[
             SizedBox(height: 80.0),
             Column(
               children: <Widget>[
-                Image.asset('assets/diamond.png'),
+                Image.asset(
+                  'assets/diamond.png',
+                  color: kShrineBackgroundWhite,
+                ),
                 SizedBox(height: 16.0),
                 Text('SHRINE'),
               ],
             ),
             SizedBox(height: 120.0),
-            // TODO: Wrap Username with AccentColorOverride (103)
-            // TODO: Remove filled: true values (103)
-            // TODO: Wrap Password with AccentColorOverride (103)
-            TextField(
-              decoration: InputDecoration(
-                filled: true,
-                labelText: "UserName",
+            AccentColorOverride(
+              color: kShrineAltYellow,
+              child: TextField(
+                focusNode: _usernameFocusNode,
+                decoration: InputDecoration(
+                  labelText: "UserName",
+                ),
+                controller: _usernameController,
               ),
-              controller: _usernameController,
             ),
-            TextField(
-              decoration: InputDecoration(
-                filled: true,
-                labelText: "Password",
+            SizedBox(height: 12.0),
+            AccentColorOverride(
+              color: kShrineAltYellow,
+              child: TextField(
+                focusNode: _passwordFocusNode,
+                decoration: InputDecoration(
+                  labelText: "Password",
+                ),
+                obscureText: true,
+                controller: _passwordController,
               ),
-              obscureText: true,
-              controller: _passwordController,
             ),
             ButtonBar(
               children: <Widget>[
@@ -65,12 +128,21 @@ class _LoginPageState extends State<LoginPage> {
                     _passwordController.clear();
                   },
                   child: Text("cancel"),
+                  shape: BeveledRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(7.0)),
+                  ),
                 ),
                 RaisedButton(
+                  color: Theme
+                      .of(context)
+                      .buttonColor,
                   onPressed: () {
                     Navigator.pop(context);
                   },
                   child: Text("next"),
+                  shape: BeveledRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(7.0)),
+                  ),
                 ),
               ],
             ),
@@ -79,6 +151,27 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
 }
 
-// TODO: Add AccentColorOverride (103)
+class AccentColorOverride extends StatelessWidget {
+  const AccentColorOverride({Key key, this.color, this.child})
+      : super(key: key);
+
+  final Color color;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Theme(
+      child: child,
+      data: Theme.of(context)
+          .copyWith(accentColor: color, brightness: Brightness.dark),
+    );
+  }
+}
