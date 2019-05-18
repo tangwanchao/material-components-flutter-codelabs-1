@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'package:Shrine/supplemental/bottom_insert_state.dart';
 import 'package:flutter/material.dart';
 
 import 'colors.dart';
@@ -21,60 +22,31 @@ class LoginPage extends StatefulWidget {
   _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
+class _LoginPageState extends BottomInsertState<LoginPage> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _usernameFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
   final _scrollController = ScrollController(keepScrollOffset: true);
   final _listKey = GlobalKey();
-  bool _didChangeMetrics = false;
-  bool _bottomInsetFinished = false;
-  double _bottomInset = 0;
 
   @override
-  void initState() {
-    WidgetsBinding.instance.addObserver(this);
-    WidgetsBinding.instance.addPersistentFrameCallback((Duration timeStamp) {
-      var bottomInset = MediaQuery
-          .of(context)
-          .viewInsets
-          .bottom;
-      if (bottomInset == 0) {
-        _didChangeMetrics = false;
-        return;
-      }
-
-      if (bottomInset != _bottomInset) {
-        _bottomInset = bottomInset;
-        _bottomInsetFinished = false;
-      } else {
-        _bottomInset = bottomInset;
-        _bottomInsetFinished = true;
-      }
-
-      if (_didChangeMetrics == true &&
-          (_usernameFocusNode.hasFocus || _passwordFocusNode.hasFocus) &&
-          _bottomInset > 50) {
-        _didChangeMetrics = false;
-        setState(() {
-          _scrollController.animateTo(
-            context.size.height - _listKey.currentContext.size.height,
-            duration: Duration(
-              milliseconds: 300,
-            ),
-            curve: Curves.decelerate,
-          );
-        });
-      }
-    });
-    super.initState();
-  }
-
-  @override
-  void didChangeMetrics() {
-    _didChangeMetrics = true;
-    super.didChangeMetrics();
+  void bottomInsertComplete() {
+    if ((_usernameFocusNode.hasFocus || _passwordFocusNode.hasFocus) &&
+        MediaQuery
+            .of(context)
+            .viewInsets
+            .bottom > 50) {
+      setState(() {
+        _scrollController.animateTo(
+          context.size.height - _listKey.currentContext.size.height,
+          duration: Duration(
+            milliseconds: 300,
+          ),
+          curve: Curves.decelerate,
+        );
+      });
+    }
   }
 
   @override
@@ -152,11 +124,6 @@ class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
     );
   }
 
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
 }
 
 class AccentColorOverride extends StatelessWidget {
