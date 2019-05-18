@@ -33,13 +33,13 @@ class TwoProductCardColumn extends StatelessWidget {
 
       double heightOfCards = (constraints.biggest.height - spacerHeight) / 2.0;
       double heightOfImages = heightOfCards - ProductCard.kTextBoxHeight;
-      // TODO: Change imageAspectRatio calculation (104)
-      double imageAspectRatio = constraints.biggest.width / heightOfImages;
+      double imageAspectRatio =
+      (heightOfImages >= 0.0 && constraints.biggest.width > heightOfImages)
+          ? constraints.biggest.width / heightOfImages
+          : 33 / 49;
+      // double imageAspectRatio = constraints.biggest.width / heightOfImages;
 
-      // TODO: Replace Column with a ListView (104)
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
+      return ListView(
         children: <Widget>[
           Padding(
             padding: EdgeInsetsDirectional.only(start: 28.0),
@@ -73,9 +73,7 @@ class OneProductCardColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: Replace Column with a ListView (104)
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
+    return ListView(
       children: <Widget>[
         ProductCard(
           product: product,

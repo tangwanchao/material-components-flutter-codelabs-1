@@ -17,49 +17,20 @@ import 'package:intl/intl.dart';
 
 import 'model/product.dart';
 import 'model/products_repository.dart';
+import 'supplemental/asymmetric_view.dart';
 
 class HomePage extends StatelessWidget {
-  // TODO: Make a collection of cards (102)
-  // TODO: Add a variable for Category (104)
+
+  const HomePage({this.category: Category.all});
+
+  final Category category;
+
   @override
   Widget build(BuildContext context) {
-    // TODO: Return an AsymmetricView (104)
-    // TODO: Pass Category variable to AsymmetricView (104)
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.menu),
-          onPressed: () {
-            // TODO: menu pressed event(102)
-          },
-        ),
-        title: Text("SHRINE"),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {
-              print("Search button");
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.tune),
-            onPressed: () {
-              print("filter button clicked3");
-            },
-          ),
-        ],
-      ),
-      body: GridView.count(
-        crossAxisCount: 2,
-        padding: EdgeInsets.all(16.0),
-        childAspectRatio: 8.0 / 9.0,
-        children: _buildGridCards(context),
-      ),
-      // TODO: Set resizeToAvoidBottomInset (101)
-    );
+    return AsymmetricView(products: ProductsRepository.loadProducts(category));
   }
 
-  List<Card> _buildGridCards(BuildContext context) {
+/*List<Card> _buildGridCards(BuildContext context) {
     List<Product> products = ProductsRepository.loadProducts(Category.all);
 
     if (products == null || products.isEmpty) {
@@ -110,5 +81,5 @@ class HomePage extends StatelessWidget {
         ),
       );
     }).toList();
-  }
+  }*/
 }
