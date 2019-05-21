@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'package:Shrine/supplemental/bottom_insert_state.dart';
+import 'package:Shrine/supplemental/edge_insert_observer.dart';
 import 'package:flutter/material.dart';
 
 import 'colors.dart';
@@ -22,7 +22,8 @@ class LoginPage extends StatefulWidget {
   _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginPageState extends BottomInsertState<LoginPage> {
+class _LoginPageState extends State<LoginPage>
+    with WidgetsBindingObserver, BottomInsertObserver {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _usernameFocusNode = FocusNode();
@@ -123,7 +124,6 @@ class _LoginPageState extends BottomInsertState<LoginPage> {
       ),
     );
   }
-
 }
 
 class AccentColorOverride extends StatelessWidget {

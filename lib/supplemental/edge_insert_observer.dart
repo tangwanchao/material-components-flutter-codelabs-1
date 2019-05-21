@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
-abstract class BottomInsertState<T extends StatefulWidget> extends State<T>
-    with WidgetsBindingObserver {
+mixin BottomInsertObserver<T extends StatefulWidget> on State<T>
+,
+    WidgetsBindingObserver {
   bool _didChangeMetrics = false;
   WidgetsBinding _widgetsBinding = WidgetsBinding.instance;
   double _preBottomInset = 0;
